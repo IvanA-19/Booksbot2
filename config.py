@@ -11,16 +11,23 @@ txt2 = """      Help list
 */start - начало работы
 */menu - открыть меню бота
 */novels - прочитать описание романа
-*/characters - прочитать описание персонажей"""
+*/characters - прочитать описание персонажей
+*/author - контакты автора"""
+
+txt3 = """Автор романов - John Antony Taylor(Иван Алексеев)
+Соавтор - Ирина Морозова
+Контакты: 
+Email - alekseev.i260303@gmail.com
+Telegram - https://t.me/Vanyok77797
+"""
 
 chapters = [[("Глава " + str(i)) for i in range(1, 36)],
             ["Глава " + str(i) for i in range(1, 65)],
             ["Глава " + str(i) for i in range(1, 36)],
-            ["Глава" + str(i) for i in range(28)]]
+            []]
 chapters[0].append("Эпилог")
 chapters[1].append("Эпилог")
 chapters[2].append("Эпилог")
-chapters[3].append("Эпилог")
 
 characters = [["Джейн Бремор", "Луиза Митчелл", "Джон Браун", "Гидеон Фишер",
                    "Элизабет Грей", "Анна Кларк", "Профессор Тейлор", "Майкл Стоун",
