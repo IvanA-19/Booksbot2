@@ -1,25 +1,32 @@
 import telebot as t
 import config
 from telebot import types
+from background import keep_alive
 
 bot = t.TeleBot(config.token)
+
 
 @bot.message_handler(content_types=['new_chat_members'])
 def hello_member(message):
     user = message.from_user.first_name
+    if message.from_user.last_name is not None:
+        user += f" {message.from_user.last_name}"
     markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     btn = types.KeyboardButton('СТАРТ')
     markup.add(btn)
     bot.send_message(message.chat.id, text=f"Рад приветствовать, {user}! {config.txt}", reply_markup=markup)
 
+
 @bot.message_handler(commands=['start'])
-def st(message):
-    bot.send_message(message.chat.id, text="Чтобы открыть меню бота используйте /Menu")
+def menu(message):
+    bot.send_message(message.chat.id, text="Чтобы открыть меню бота используйте /menu")
+
 
 @bot.message_handler(commands=['help'])
 def help(message):
     text = config.txt2
     bot.send_message(message.chat.id, text)
+
 
 @bot.message_handler(commands=['menu'])
 def start_message(message):
@@ -31,6 +38,7 @@ def start_message(message):
     text = "Отлично! Теперь выберите, что вы хотите сделать)"
     bot.send_message(message.chat.id, text, reply_markup=markup)
 
+
 @bot.message_handler(commands=['Персонажи', 'characters'])
 def characters(message):
     novels = ["Наше счастливое вчера", "Из мажоров в люди", "Какой же выбор сделать?", "Тени грешного города", "Повеси о пространстве и времени", "Пьеса об Иване и Юлианне"]
@@ -41,6 +49,7 @@ def characters(message):
         markup_inline.add(items[i])
     bot.send_message(message.chat.id, 'Описание персонажей какого произведения вам интересно?', reply_markup=markup_inline)
 
+
 @bot.message_handler(commands=['novels', 'О романах'])
 def about_novels(message):
     novels = ["Наше счастливое вчера", "Из мажоров в люди", "Какой же выбор сделать?", "Тени грешного города", "Повести о пространстве и времени", "Пьеса об Иване и Юлианне"]
@@ -50,6 +59,7 @@ def about_novels(message):
         items.append(types.InlineKeyboardButton(text=novels[i], callback_data=f'novel_{str(i)}'))
         markup_inline.add(items[i])
     bot.send_message(message.chat.id, 'Описание какого произведения вы хотите прочитать?', reply_markup=markup_inline)
+
 
 @bot.message_handler(content_types=['text'])
 def start(message):
@@ -66,6 +76,7 @@ def start(message):
         bot.send_message(message.chat.id, text="Давайте выберем произведение)\nИспользуйте /characters или /Персонажи", reply_markup=rem)
     elif(message.text == 'СТАРТ'):
         bot.send_message(message.chat.id, text="Чтобы открыть меню бота используйте /menu", reply_markup=rem)
+
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
@@ -512,8 +523,6 @@ def callback_inline(call):
 
         bot.edit_message_text('Выберите главу:', call.message.chat.id, call.message.message_id, reply_markup=markup_inline)
 
-
-
     elif (call.data == callback1[2]):
         items_chapt.clear()
         markup_inline = types.InlineKeyboardMarkup()
@@ -634,8 +643,6 @@ def callback_inline(call):
 
     elif (call.data == callback1[3]):
         bot.edit_message_text("", call.message.chat.id, call.message.message_id)
-        s
-
 
     for g in range(36):
         if(call.data == chaptCall[0][g]):
@@ -652,7 +659,6 @@ def callback_inline(call):
                 bot.send_document(call.message.chat.id, file)
                 file.close()
                 #bot.edit_message_text(f'В разработке...', call.message.chat.id, call.message.message_id)
-
 
     for i in range(len(config.chapters[1])):
         if(call.data == f'chpt1{str(i)}'):
@@ -683,7 +689,6 @@ def callback_inline(call):
                 bot.edit_message_text(f'Высылаю эпилог', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
-
 
     items_char = []
 
@@ -722,16 +727,13 @@ def callback_inline(call):
         elif(call.data == f"novel_{str(i)}"):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
 
-
     for i in range(len(config.characters[0])):
         if(call.data == f'chrt0{str(i)}'):
             bot.edit_message_text(config.inf_chrt[0][i], call.message.chat.id, call.message.message_id)
 
-
     for i in range(len(config.characters[1])):
         if(call.data == f'chrt1{str(i)}'):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
-
 
     for i in range(len(config.characters[2])):
         if(call.data == f'chrt2{str(i)}'):
@@ -741,5 +743,8 @@ def callback_inline(call):
         if(call.data == f'chrt3{str(i)}'):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
 
-bot.polling(none_stop=True)
+
+if __name__ == '__main__':
+    keep_alive()
+    bot.polling(none_stop=True)
 
