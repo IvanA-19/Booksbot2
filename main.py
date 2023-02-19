@@ -5,28 +5,22 @@ from background import keep_alive
 
 bot = t.TeleBot(config.token)
 
-
 @bot.message_handler(content_types=['new_chat_members'])
 def hello_member(message):
     user = message.from_user.first_name
-    if message.from_user.last_name is not None:
-        user += f" {message.from_user.last_name}"
     markup = types.ReplyKeyboardMarkup(row_width=2, resize_keyboard=True)
     btn = types.KeyboardButton('СТАРТ')
     markup.add(btn)
     bot.send_message(message.chat.id, text=f"Рад приветствовать, {user}! {config.txt}", reply_markup=markup)
 
-
 @bot.message_handler(commands=['start'])
-def menu(message):
+def st(message):
     bot.send_message(message.chat.id, text="Чтобы открыть меню бота используйте /menu")
-
 
 @bot.message_handler(commands=['help'])
 def help(message):
     text = config.txt2
     bot.send_message(message.chat.id, text)
-
 
 @bot.message_handler(commands=['menu'])
 def start_message(message):
@@ -38,7 +32,6 @@ def start_message(message):
     text = "Отлично! Теперь выберите, что вы хотите сделать)"
     bot.send_message(message.chat.id, text, reply_markup=markup)
 
-
 @bot.message_handler(commands=['Персонажи', 'characters'])
 def characters(message):
     novels = ["Наше счастливое вчера", "Из мажоров в люди", "Какой же выбор сделать?", "Тени грешного города", "Повеси о пространстве и времени", "Пьеса об Иване и Юлианне"]
@@ -48,7 +41,6 @@ def characters(message):
         items.append(types.InlineKeyboardButton(text=novels[i], callback_data=f'novel{str(i)}'))
         markup_inline.add(items[i])
     bot.send_message(message.chat.id, 'Описание персонажей какого произведения вам интересно?', reply_markup=markup_inline)
-
 
 @bot.message_handler(commands=['novels', 'О романах'])
 def about_novels(message):
@@ -60,6 +52,9 @@ def about_novels(message):
         markup_inline.add(items[i])
     bot.send_message(message.chat.id, 'Описание какого произведения вы хотите прочитать?', reply_markup=markup_inline)
 
+@bot.message_handler(commands=['author'])
+def contact_information(message):
+  bot.send_message(message.chat.id, text=config.txt3)
 
 @bot.message_handler(content_types=['text'])
 def start(message):
@@ -77,7 +72,6 @@ def start(message):
     elif(message.text == 'СТАРТ'):
         bot.send_message(message.chat.id, text="Чтобы открыть меню бота используйте /menu", reply_markup=rem)
 
-
 @bot.callback_query_handler(func=lambda call: True)
 def callback_inline(call):
     novels = ["Наше счастливое вчера", "Из мажоров в люди", "Какой же выбор сделать?", "Тени грешного города", "Повести о пространстве и времени", "Пьеса об Иване и Юлианне"]
@@ -91,57 +85,55 @@ def callback_inline(call):
     if call.data == 'full':
         markup_inline = types.InlineKeyboardMarkup()
         for j in range(len(novels)):
-            
             items.append(types.InlineKeyboardButton(text=novels[j], callback_data=callback[j]))
             markup_inline.add(items[j])
         bot.edit_message_text('Доступные произведения:', call.message.chat.id, call.message.message_id, reply_markup=markup_inline)
 
     elif(call.data == 'certain'):
         markup_inline = types.InlineKeyboardMarkup()
-        for j in range(len(novels)):
+        for j in range(len(novels)-3):
             items.append(types.InlineKeyboardButton(text=novels[j], callback_data=callback1[j]))
             markup_inline.add(items[j])
         bot.edit_message_text('Доступные произведения:', call.message.chat.id, call.message.message_id, reply_markup=markup_inline)
         #bot.edit_message_text('В разрабтке...', call.message.chat.id, call.message.message_id)
     elif(call.data == callback[0]):
         bot.edit_message_text('Отличный выбор!', call.message.chat.id, call.message.message_id)
-        file = open("books/novels/Наше счастливое вчера.docx", "rb")
-        audio1 = open("books/audioBooks/Наше счастливое вчера. Главы 1 - 10.mp3", "rb")
+        file = open("novels/Наше счастливое вчера.docx", "rb")
+        
         bot.send_document(call.message.chat.id, file)
-        bot.send_message(call.message.chat.id, text='Также предлагаю аудиоверсию книги)')
-        bot.send_document(call.message.chat.id, audio1)
-        file.close()
-        audio1.close()
+        
         ############
     elif (call.data == callback[1]):
         bot.edit_message_text('Классика!', call.message.chat.id, call.message.message_id)
-        file = open("books/novels/роман.docx", "rb")
+        file = open("novels/роман.docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
     elif (call.data == callback[2]):
         bot.edit_message_text('Опять Алехины...', call.message.chat.id, call.message.message_id)
-        file = open("books/novels/роман_2.docx", "rb")
+        file = open("novels/роман_2.docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
     elif (call.data == callback[3]):
         bot.edit_message_text('Немного мистики на улицах Петербурга? Почему бы и нет)', call.message.chat.id, call.message.message_id)
-        file = open("books/novels/Роман_Питер.docx", "rb")
+        file = open("Тени грешного города.docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
     elif (call.data == callback[4]):
         bot.edit_message_text('Длинная история о великих открытиях учеников 11 класса... Звучит интересно)', call.message.chat.id, call.message.message_id)
-        file = open("books/novels/Повести о пространстве и времени.docx", "rb")
+        file = open("novels/Повести о пространстве и времени.docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
     elif (call.data == callback[5]):
         bot.edit_message_text('Приготовьте чай! Самое время окунуться в атмосферу 19 века!', call.message.chat.id,
                               call.message.message_id)
-        file = open("books/novels/Часть 1. Предательство лучшего друга..docx", "rb")
+        file = open("novels/Часть 1. Предательство лучшего друга..docx", "rb")
         bot.send_document(call.message.chat.id, file)
-        file = open("books/novels/Часть 2. Месть за прошлое..docx", "rb")
+        file = open("novels/Часть 2. Месть за прошлое..docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
+
     elif (call.data == callback1[0]):
+        #bot.edit_message_text('Отличный выбор!', call.message.chat.id, call.message.message_id)
         markup_inline = types.InlineKeyboardMarkup()
         for j in range(6):
             if(j != 5):
@@ -523,6 +515,8 @@ def callback_inline(call):
 
         bot.edit_message_text('Выберите главу:', call.message.chat.id, call.message.message_id, reply_markup=markup_inline)
 
+
+
     elif (call.data == callback1[2]):
         items_chapt.clear()
         markup_inline = types.InlineKeyboardMarkup()
@@ -641,54 +635,60 @@ def callback_inline(call):
 
 
 
+
+
+
     elif (call.data == callback1[3]):
-        bot.edit_message_text("", call.message.chat.id, call.message.message_id)
+        bot.edit_message_text('Приношу свои извинения, но на данный момент роман находится в стадии написания и доступен только в полном виде...', call.message.chat.id, call.message.message_id)
+
 
     for g in range(36):
         if(call.data == chaptCall[0][g]):
             if(g != 35):
-                filename = f"books/глава {g + 1}.docx"
+                filename = f"глава {g + 1}.docx"
                 file = open(filename, "rb")
                 bot.edit_message_text(f'Высылаю главу {g + 1}', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
             else:
-                filename = f"books/Эпилог.docx"
+                filename = "Эпилог.docx"
                 file = open(filename, "rb")
-                bot.edit_message_text(f'Высылаю эпилог', call.message.chat.id, call.message.message_id)
+                bot.edit_message_text('Высылаю эпилог', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
                 #bot.edit_message_text(f'В разработке...', call.message.chat.id, call.message.message_id)
 
+
     for i in range(len(config.chapters[1])):
         if(call.data == f'chpt1{str(i)}'):
             if(i != len(config.chapters[1]) - 1):
-                filename = f"books/novel1/глава {i + 1}.odt"
+                filename = f"novel1/глава {i + 1}.odt"
                 file = open(filename, "rb")
                 bot.edit_message_text(f'Высылаю главу {i + 1}', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
             else:
-                filename = f"books/novel1/эпилог.odt"
+                filename = "novel1/эпилог.odt"
                 file = open(filename, "rb")
-                bot.edit_message_text(f'Высылаю эпилог', call.message.chat.id, call.message.message_id)
+                bot.edit_message_text('Высылаю эпилог', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
 
     for i in range(len(config.chapters[2])):
         if(call.data == f'chpt2{str(i)}'):
             if(i != len(config.chapters[2]) - 1):
-                filename = f"books/novel2/глава {i + 1}.odt"
+                filename = f"novel2/глава {i + 1}.odt"
                 file = open(filename, "rb")
                 bot.edit_message_text(f'Высылаю главу {i + 1}', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
             else:
-                filename = f"books/novel2/эпилог.odt"
+                filename = "novel2/эпилог.odt"
                 file = open(filename, "rb")
-                bot.edit_message_text(f'Высылаю эпилог', call.message.chat.id, call.message.message_id)
+                bot.edit_message_text('Высылаю эпилог', call.message.chat.id, call.message.message_id)
                 bot.send_document(call.message.chat.id, file)
                 file.close()
+
 
     items_char = []
 
@@ -727,13 +727,16 @@ def callback_inline(call):
         elif(call.data == f"novel_{str(i)}"):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
 
+
     for i in range(len(config.characters[0])):
         if(call.data == f'chrt0{str(i)}'):
             bot.edit_message_text(config.inf_chrt[0][i], call.message.chat.id, call.message.message_id)
 
+
     for i in range(len(config.characters[1])):
         if(call.data == f'chrt1{str(i)}'):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
+
 
     for i in range(len(config.characters[2])):
         if(call.data == f'chrt2{str(i)}'):
@@ -743,8 +746,5 @@ def callback_inline(call):
         if(call.data == f'chrt3{str(i)}'):
             bot.edit_message_text('В разработке...', call.message.chat.id, call.message.message_id)
 
-
-if __name__ == '__main__':
-    keep_alive()
-    bot.polling(none_stop=True)
-
+keep_alive()
+bot.polling(none_stop=True, interval=0)
