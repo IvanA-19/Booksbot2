@@ -80,6 +80,7 @@ def callback_inline(call):
     if call.data == 'full':
         markup_inline = types.InlineKeyboardMarkup()
         for j in range(len(novels)):
+            
             items.append(types.InlineKeyboardButton(text=novels[j], callback_data=callback[j]))
             markup_inline.add(items[j])
         bot.edit_message_text('Доступные произведения:', call.message.chat.id, call.message.message_id, reply_markup=markup_inline)
@@ -129,9 +130,7 @@ def callback_inline(call):
         file = open("books/novels/Часть 2. Месть за прошлое..docx", "rb")
         bot.send_document(call.message.chat.id, file)
         file.close()
-
     elif (call.data == callback1[0]):
-        #bot.edit_message_text('Отличный выбор!', call.message.chat.id, call.message.message_id)
         markup_inline = types.InlineKeyboardMarkup()
         for j in range(6):
             if(j != 5):
@@ -633,11 +632,9 @@ def callback_inline(call):
 
 
 
-
-
-
     elif (call.data == callback1[3]):
-        bot.edit_message_text('Приношу свои извинения, но на данный момент роман находится в стадии написания и доступен только в полном виде...', call.message.chat.id, call.message.message_id)
+        bot.edit_message_text("", call.message.chat.id, call.message.message_id)
+        s
 
 
     for g in range(36):
