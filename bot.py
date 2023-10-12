@@ -1,5 +1,6 @@
 from telebot import TeleBot, types
 from config import *
+from time import sleep
 
 bot = TeleBot(api_token)
 
@@ -54,6 +55,8 @@ def get_user(message) -> str:
 def start(message):
     user = get_user(message)
     keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, f'Рад приветствовать, {user}!\n'
                                       'Для отображения списка команд используй /help'
                                       '\nДля получения информации используй /info\n'
@@ -63,24 +66,32 @@ def start(message):
 @bot.message_handler(commands=['menu'])
 def menu(message):
     menu_keyboard = get_reply_keyboard(keyboard_buttons=main_menu_buttons, menu_keyboard=True, one_time=True)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, 'Меню открыто \U00002705', reply_markup=menu_keyboard)
 
 
 @bot.message_handler(commands=['help'])
 def help_list(message):
     keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, text=helpList, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['contacts'])
 def contacts_list(message):
     keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, text=contacts, reply_markup=keyboard)
 
 
 @bot.message_handler(commands=['info'])
 def information(message):
     keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, text=info, reply_markup=keyboard)
 
 
@@ -88,30 +99,44 @@ def information(message):
 def check_message(message):
     if message.text == 'Завершить работу \U0001F4A4':
         keyboard = get_reply_keyboard(keyboard_buttons=['СТАРТ'], one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id,
                          'Было приятно с вами работать!\nВсего доброго\U0001FAE1',
                          reply_markup=keyboard)
     elif message.text == 'Меню':
         keyboard = get_reply_keyboard(keyboard_buttons=main_menu_buttons, menu_keyboard=True, one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, 'Выберите, что вы хотите сделать\U0001F607', reply_markup=keyboard)
 
     elif message.text == 'Выбрать произведение \U0001F4DA':
         keyboard = get_inline_keyboard()
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, 'Какое произведение вас интересует?', reply_markup=keyboard)
 
     elif message.text == 'СТАРТ':
         user = get_user(message)
         keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, f'Приветсвую, {user}!\nДля открытия меню жми кнопку',
                          reply_markup=keyboard)
     elif message.text == 'Контакты \U0001F4D3':
         keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, text=contacts, reply_markup=keyboard)
     elif message.text == 'Информация \U00002139':
         keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, text=info, reply_markup=keyboard)
     else:
         keyboard = get_reply_keyboard(keyboard_buttons=['Меню'], one_time=True)
+        bot.send_chat_action(message.chat.id, 'typing')
+        sleep(2)
         bot.send_message(message.chat.id, 'Прости, я не понимаю \U0001F97A\n'
                                           'Исполбзуй /help для просмотра списка команд \U0001F9D0\n'
                                           'Или жми на кнопку Меню \U0001F92F', reply_markup=keyboard)
@@ -120,6 +145,8 @@ def check_message(message):
 @bot.message_handler(content_types=['new_chat_members'])
 def hello_member(message):
     user = get_user(message)
+    bot.send_chat_action(message.chat.id, 'typing')
+    sleep(2)
     bot.send_message(message.chat.id, text=f'Приветствую, {user}!{hello}')
 
 
@@ -130,7 +157,12 @@ def process_callback(call):
             if call.data == element:
                 file = open(f'data/novels/{novels[i]}.docx', 'rb')
                 keyboard = get_inline_keyboard_for_novel(novels[i])
-                bot.edit_message_text('Приятного прочтения\U0001F60A', call.message.chat.id, call.message.id)
+                bot.edit_message_text('Уже отправляю \U0001F60C', call.message.chat.id, call.message.id)
+                bot.send_chat_action(call.message.chat.id, 'typing')
+                sleep(2)
+                bot.send_message(call.message.chat.id, 'Приятного прочтения\U0001F60A')
+                bot.send_chat_action(call.message.chat.id, 'upload_document')
+                sleep(2)
                 bot.send_document(call.message.chat.id, document=file, reply_markup=keyboard)
 
         for i, element in enumerate(characters_callback_id):
@@ -138,24 +170,37 @@ def process_callback(call):
                 if 'characters' in element:
                     # Delete if when all files with characters be in folder
                     if i > 0:
-                        bot.send_message(call.message.chat.id, 'В разработке...')
-                        print(i)
+                        bot.send_chat_action(call.message.chat.id, 'typing')
+                        sleep(2)
+                        bot.send_message(call.message.chat.id, 'В разработке... \U0001F616')
                     else:
                         file = open(f'data/characters/{novels[i]} персонажи.docx', 'rb')
+                        bot.send_chat_action(call.message.chat.id, 'typing')
+                        sleep(2)
                         bot.send_message(call.message.chat.id, 'Все песонажи в файле\U0001F60F')
+                        bot.send_chat_action(call.message.chat.id, 'upload_document')
+                        sleep(2)
                         bot.send_document(call.message.chat.id, document=file)
         for i, element in enumerate(about_callback_id):
             # Delete if when description will be in folder about
             if call.data == element:
                 if not(i >= 0):
                     file = open(f'data/about/{novels[i]} о романе.docx', 'rb')
+                    bot.send_chat_action(call.message.chat.id, 'typing')
+                    sleep(2)
                     bot.send_message(call.message.chat.id, 'Описание романа в файле\U0001F60C')
+                    bot.send_chat_action(call.message.chat.id, 'upload_document')
+                    sleep(2)
                     bot.send_document(call.message.chat.id, document=file)
                 else:
-                    bot.send_message(call.message.chat.id, 'В разработке...')
+                    bot.send_chat_action(call.message.chat.id, 'typing')
+                    sleep(2)
+                    bot.send_message(call.message.chat.id, 'В разработке... \U0001F616')
 
         if call.data == 'menu':
             keyboard = get_reply_keyboard(keyboard_buttons=main_menu_buttons, menu_keyboard=True, one_time=True)
+            bot.send_chat_action(call.message.chat.id, 'typing')
+            sleep(2)
             bot.send_message(call.message.chat.id, 'Выберите, что вы хотите сделать\U0001F607',
                              reply_markup=keyboard)
 
